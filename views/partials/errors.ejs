@@ -1,0 +1,9 @@
+<% if (errors && errors.length) { %>
+  <div class="alert" role="alert">
+    <%- icon('alert') %>
+    <div>
+      <strong>Please fix the following <%= errors.length === 1 ? 'problem' : errors.length + ' problems' %>:</strong>
+      <ul><% errors.forEach(function (e) { %><li><%= e %></li><% }) %></ul>
+    </div>
+  </div>
+<% } %>

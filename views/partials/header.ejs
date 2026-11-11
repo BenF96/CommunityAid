@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#05070a">
+  <title><%= title %> | Community Aid Hub Admin</title>
+  <link rel="stylesheet" href="/css/style.css?v=<%= assetVersion %>">
+  <script src="/js/app.js?v=<%= assetVersion %>" defer></script>
+</head>
+<body class="<%= sidebarCollapsed ? 'sidebar-collapsed' : '' %>">
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="sidebar-brand">
+      <a href="/" class="brand">
+        <span class="brand-logo"><%- icon('heart') %></span>
+        <span class="brand-text"><strong>Community Aid</strong><small>Admin console</small></span>
+      </a>
+      <button type="button" class="icon-btn sidebar-close" data-action="close-sidebar" aria-label="Close menu"><%- icon('x') %></button>
+    </div>
+
+    <a href="/requests/new" class="btn btn-block sidebar-cta" title="New request"><%- icon('plus') %><span class="label">New request</span></a>
+
+    <nav class="side-nav">
+      <div class="nav-group">
+        <p class="nav-heading">Overview</p>
+        <%- navLink('/', 'dashboard', 'Dashboard') %>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-heading">Aid requests</p>
+        <%- navLink('/requests', 'inbox', 'All requests', nav.requests) %>
+        <%- navLink('/requests?status=open&urgency=3', 'alert', 'Urgent &amp; open', nav.urgentOpen) %>
+        <%- navLink('/requests?status=pending', 'clock', 'Pending', nav.pending) %>
+        <%- navLink('/requests?status=in-progress', 'progress', 'In progress', nav.inProgress) %>
+        <%- navLink('/requests?status=fulfilled', 'check', 'Fulfilled', nav.fulfilled) %>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-heading">Resources</p>
+        <%- navLink('/resources', 'pin', 'All resources', nav.resources) %>
+        <%- navLink('/resources?category=food', 'food', 'Food', nav.food) %>
+        <%- navLink('/resources?category=financial', 'money', 'Financial', nav.financial) %>
+        <%- navLink('/resources/new', 'plus', 'Add resource') %>
+      </div>
+
+      <div class="nav-group">
+        <p class="nav-heading">Tools</p>
+        <a href="/requests/export.csv" class="nav-link" title="Export requests (CSV)"><%- icon('download') %><span class="label">Export requests (CSV)</span></a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="label">Open requests: <strong><%= nav.pending + nav.inProgress %></strong></span>
+    </div>
+  </aside>
+  <div class="sidebar-backdrop" data-action="close-sidebar" aria-hidden="true"></div>
+
+  <div class="shell">
+    <header class="topbar">
+      <button type="button" class="icon-btn hamburger" data-action="toggle-sidebar"
+              aria-controls="sidebar" aria-expanded="<%= sidebarCollapsed ? 'false' : 'true' %>" aria-label="Toggle navigation menu">
+        <%- icon('menu') %>
+      </button>
+      <span class="topbar-title"><%= title %></span>
+      <form class="topbar-search" action="/requests" method="GET" role="search">
+        <%- icon('search') %>
+        <input type="search" name="q" placeholder="Search requests…" aria-label="Search requests by name, reference, phone or email">
+      </form>
+      <a href="/requests/new" class="btn btn-small topbar-cta"><%- icon('plus') %><span>New request</span></a>
+    </header>
+
+    <main id="main" class="content" tabindex="-1">
+      <% if (flash) { %>
+        <div class="flash flash-<%= flash.type === 'error' ? 'error' : 'success' %>" role="status">
+          <%- icon(flash.type === 'error' ? 'alert' : 'check') %>
+          <span><%= flash.text %></span>
+          <button type="button" class="icon-btn" data-action="dismiss" aria-label="Dismiss message"><%- icon('x') %></button>
+        </div>
+      <% } %>

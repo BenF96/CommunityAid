@@ -1,0 +1,134 @@
+<%- include('../partials/header') %>
+
+<% var r = aidRequest; var steps = ['pending', 'in-progress', 'fulfilled']; var current = steps.indexOf(r.status); %>
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="/">Dashboard</a><span>/</span><a href="/requests">Aid requests</a><span>/</span><span aria-current="page"><%= r.refCode %></span>
+</nav>
+
+<div class="page-head">
+  <div>
+    <div class="chips">
+      <span class="ref mono"><%= r.refCode %></span>
+      <span class="tag tag-<%= r.aidType %>"><%- icon(r.aidType === 'food' ? 'food' : 'money') %> <%= r.aidType %></span>
+      <span class="urgency u<%= r.urgency %>"><%= r.urgencyLabel %> urgency</span>
+      <span class="status s-<%= r.status %>"><%= statusLabel(r.status) %></span>
+    </div>
+    <h1><%= r.fullName %></h1>
+    <p class="muted">Submitted <%= dateTime(r.createdAt) %> · <%= r.status === 'fulfilled' ? 'Fulfilled after ' : 'Open for ' %><%= r.daysOpen %> day<%= r.daysOpen === 1 ? '' : 's' %></p>
+  </div>
+  <div class="actions no-print">
+    <a href="/requests/<%= r._id %>/edit" class="btn"><%- icon('edit') %> Edit</a>
+    <button type="button" class="btn btn-ghost" data-action="print"><%- icon('print') %> Print</button>
+    <form method="POST" action="/requests/<%= r._id %>?_method=DELETE"
+          data-confirm="Delete request <%= r.refCode %> from <%= r.fullName %>? This cannot be undone.">
+      <button class="btn btn-danger-ghost" type="submit"><%- icon('trash') %> Delete</button>
+    </form>
+  </div>
+</div>
+
+<!-- Progress stepper -->
+<section class="panel">
+  <ol class="stepper" aria-label="Request progress">
+    <% steps.forEach(function (s, i) { %>
+      <li class="<%= i < current ? 'done' : i === current ? 'current' : '' %>" <%- i === current ? 'aria-current="step"' : '' %>>
+        <span class="step-dot"><%- i < current || (i === current && s === 'fulfilled') ? icon('check') : i + 1 %></span>
+        <span class="step-label"><%= statusLabel(s) %></span>
+      </li>
+    <% }) %>
+  </ol>
+  <form class="status-actions no-print" method="POST" action="/requests/<%= r._id %>/status?_method=PATCH">
+    <span class="muted small">Move to:</span>
+    <% steps.forEach(function (s) { %>
+      <button class="btn btn-small <%= s === r.status ? 'btn-current' : 'btn-ghost' %>" type="submit" name="status" value="<%= s %>" <%= s === r.status ? 'disabled' : '' %>>
+        <%- icon(s === 'pending' ? 'clock' : s === 'in-progress' ? 'progress' : 'check') %> <%= statusLabel(s) %>
+      </button>
+    <% }) %>
+  </form>
+</section>
+
+<div class="grid-2 grid-wide-left">
+  <div>
+    <section class="panel">
+      <div class="panel-head"><h2><%- icon('inbox') %> What is needed</h2></div>
+      <p class="lead"><%= r.description %></p>
+      <div class="mini-stats">
+        <div><span class="mini-value"><%= r.aidType === 'food' ? 'Food' : 'Financial' %></span><span class="mini-label">Type of aid</span></div>
+        <div><span class="mini-value"><%= r.householdSize %></span><span class="mini-label">Household size</span></div>
+        <% if (r.aidType === 'financial') { %>
+          <div><span class="mini-value"><%= money(r.amountNeeded) %></span><span class="mini-label">Amount needed</span></div>
+        <% } %>
+        <div><span class="mini-value"><%= r.urgencyLabel %></span><span class="mini-label">Urgency</span></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2><%- icon('list') %> Timeline</h2></div>
+      <% if (!r.history || r.history.length === 0) { %>
+        <p class="muted">No history recorded for this request.</p>
+      <% } else { %>
+        <ol class="timeline">
+          <% r.history.slice().reverse().forEach(function (h) { %>
+            <li class="tl-<%= h.action %>">
+              <span class="tl-dot"></span>
+              <div>
+                <div><%= h.detail %></div>
+                <div class="muted small"><%= dateTime(h.at) %> · <%= timeAgo(h.at) %></div>
+              </div>
+            </li>
+          <% }) %>
+        </ol>
+      <% } %>
+    </section>
+  </div>
+
+  <div>
+    <section class="panel">
+      <div class="panel-head"><h2><%- icon('users') %> Requester</h2></div>
+      <ul class="meta-list large">
+        <li><%- icon('users') %><div><span class="meta-k">Name</span><span><%= r.fullName %></span></div></li>
+        <li><%- icon('phone') %><div><span class="meta-k">Phone</span><% if (r.phone) { %><a href="tel:<%= r.phone %>"><%= r.phone %></a><% } else { %><span>-</span><% } %></div></li>
+        <li><%- icon('mail') %><div><span class="meta-k">Email</span><% if (r.email) { %><a href="mailto:<%= r.email %>"><%= r.email %></a><% } else { %><span>-</span><% } %></div></li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2><%- icon('pin') %> Case handling</h2></div>
+      <% if (r.assignedResource) { %>
+        <div class="assigned">
+          <span class="meta-k">Assigned resource</span>
+          <a href="/resources/<%= r.assignedResource._id %>" class="strong"><%= r.assignedResource.name %></a>
+          <div class="muted small">
+            <%= r.assignedResource.type || r.assignedResource.category %>
+            <% if (r.assignedResource.phone) { %> · <a href="tel:<%= r.assignedResource.phone %>"><%= r.assignedResource.phone %></a><% } %>
+          </div>
+          <% if (r.assignedResource.hours) { %><div class="muted small"><%= r.assignedResource.hours %></div><% } %>
+        </div>
+      <% } else { %>
+        <p class="muted">Not assigned to a resource yet.</p>
+        <% if (suggestions.length) { %>
+          <p class="small strong">Suggested <%= r.aidType %> resources:</p>
+          <ul class="suggestions">
+            <% suggestions.forEach(function (s) { %>
+              <li><a href="/resources/<%= s._id %>"><%= s.name %></a><span class="muted small"><%= s.type || '' %></span></li>
+            <% }) %>
+          </ul>
+          <a href="/requests/<%= r._id %>/edit" class="btn btn-small btn-ghost no-print">Assign a resource</a>
+        <% } %>
+      <% } %>
+
+      <div class="notes">
+        <span class="meta-k">Case notes</span>
+        <p><%= r.notes || 'No notes yet.' %></p>
+      </div>
+
+      <dl class="kv">
+        <dt>Submitted</dt><dd><%= dateTime(r.createdAt) %></dd>
+        <dt>Last updated</dt><dd><%= dateTime(r.updatedAt) %></dd>
+        <dt>Fulfilled</dt><dd><%= r.fulfilledAt ? dateTime(r.fulfilledAt) : '-' %></dd>
+      </dl>
+    </section>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

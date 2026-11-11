@@ -1,0 +1,146 @@
+<%- include('../partials/header') %>
+
+<% var isEdit = !!aidRequest._id; %>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="/">Dashboard</a><span>/</span><a href="/requests">Aid requests</a><span>/</span>
+  <% if (isEdit) { %><a href="/requests/<%= aidRequest._id %>"><%= aidRequest.refCode || 'Request' %></a><span>/</span><span aria-current="page">Edit</span>
+  <% } else { %><span aria-current="page">New</span><% } %>
+</nav>
+
+<div class="page-head">
+  <div>
+    <h1><%= isEdit ? 'Edit request' : 'New request' %></h1>
+    <p class="muted">
+      <% if (isEdit) { %>Update the request details, status and case handling. Every change is recorded in the timeline.
+      <% } else { %>Log a request taken by phone, walk-in or referral. A reference number is generated on save.<% } %>
+    </p>
+  </div>
+</div>
+
+<div class="form-layout">
+  <form method="POST" action="<%= action %>" class="panel form">
+    <%- include('../partials/errors', { errors }) %>
+
+    <fieldset>
+      <legend><span class="step">1</span> Requester</legend>
+      <label class="field">
+        <span class="field-label">Full name <span class="req">*</span></span>
+        <input name="fullName" required maxlength="100" autocomplete="name" value="<%= aidRequest.fullName || '' %>">
+      </label>
+      <div class="row">
+        <label class="field">
+          <span class="field-label">Phone</span>
+          <input type="tel" name="phone" maxlength="30" autocomplete="tel" value="<%= aidRequest.phone || '' %>">
+        </label>
+        <label class="field">
+          <span class="field-label">Email</span>
+          <input type="email" name="email" maxlength="120" autocomplete="email" value="<%= aidRequest.email || '' %>">
+        </label>
+      </div>
+      <p class="hint"><%- icon('info') %> At least one contact method is required.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="step">2</span> Need</legend>
+      <div class="choice-cards" role="radiogroup" aria-label="Type of help">
+        <label class="choice">
+          <input type="radio" name="aidType" value="food" <%= aidRequest.aidType !== 'financial' ? 'checked' : '' %>>
+          <span class="choice-body"><%- icon('food') %><strong>Food</strong><small>Groceries, meals, pantry items</small></span>
+        </label>
+        <label class="choice">
+          <input type="radio" name="aidType" value="financial" <%= aidRequest.aidType === 'financial' ? 'checked' : '' %>>
+          <span class="choice-body"><%- icon('money') %><strong>Financial</strong><small>Rent, utilities, emergency costs</small></span>
+        </label>
+      </div>
+
+      <div class="row">
+        <label class="field">
+          <span class="field-label">People in household</span>
+          <input type="number" name="householdSize" min="1" max="30" value="<%= aidRequest.householdSize != null ? aidRequest.householdSize : 1 %>">
+        </label>
+        <label class="field" data-show-for="financial">
+          <span class="field-label">Amount needed (<%= CURRENCY_SYMBOL %>, <%= CURRENCY %>)</span>
+          <input type="number" name="amountNeeded" min="0" step="0.01" placeholder="0.00" value="<%= aidRequest.amountNeeded != null ? aidRequest.amountNeeded : '' %>">
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Situation <span class="req">*</span></span>
+        <textarea name="description" rows="4" required maxlength="1000" data-counter
+                  placeholder="What happened, what is needed, and any deadlines (e.g. eviction or disconnection date)"><%= aidRequest.description || '' %></textarea>
+      </label>
+
+      <div class="field">
+        <span class="field-label">Urgency</span>
+        <div class="segmented" role="radiogroup" aria-label="Urgency">
+          <% [[1, 'Low', 'Within a few weeks'], [2, 'Medium', 'Within a week'], [3, 'High', 'In the next day or two']].forEach(function (u) { %>
+            <label class="seg-opt u<%= u[0] %>">
+              <input type="radio" name="urgency" value="<%= u[0] %>" <%= Number(aidRequest.urgency || 2) === u[0] ? 'checked' : '' %>>
+              <span><strong><%= u[1] %></strong><small><%= u[2] %></small></span>
+            </label>
+          <% }) %>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="staff">
+        <legend><span class="step">3</span> Case handling</legend>
+        <div class="row">
+          <label class="field">
+            <span class="field-label">Status</span>
+            <select name="status">
+              <% ['pending', 'in-progress', 'fulfilled'].forEach(function (s) { %>
+                <option value="<%= s %>" <%= aidRequest.status === s ? 'selected' : '' %>><%= statusLabel(s) %></option>
+              <% }) %>
+            </select>
+          </label>
+          <label class="field">
+            <span class="field-label">Assigned resource</span>
+            <select name="assignedResource">
+              <option value="">- Not assigned -</option>
+              <% ['food', 'financial'].forEach(function (cat) { var list = resources.filter(function (x) { return x.category === cat; }); if (list.length) { %>
+                <optgroup label="<%= cat === 'food' ? 'Food' : 'Financial' %>">
+                  <% list.forEach(function (res) { %>
+                    <option value="<%= res._id %>" <%= aidRequest.assignedResource && String(aidRequest.assignedResource._id || aidRequest.assignedResource) === String(res._id) ? 'selected' : '' %>><%= res.name %></option>
+                  <% }) %>
+                </optgroup>
+              <% } }) %>
+            </select>
+          </label>
+        </div>
+        <label class="field">
+          <span class="field-label">Case notes</span>
+          <textarea name="notes" rows="3" maxlength="1000" data-counter placeholder="Calls made, items delivered, next steps…"><%= aidRequest.notes || '' %></textarea>
+        </label>
+      </fieldset>
+
+    <div class="form-actions">
+      <button class="btn" type="submit"><%- icon('check') %> <%= isEdit ? 'Save changes' : 'Create request' %></button>
+      <a href="<%= isEdit ? '/requests/' + aidRequest._id : '/requests' %>" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+
+  <aside class="form-aside">
+    <section class="panel">
+      <h2><%- icon('pin') %> Available resources</h2>
+      <% ['food', 'financial'].forEach(function (cat) { var list = resources.filter(function (x) { return x.category === cat; }); %>
+        <div data-show-for="<%= cat %>">
+          <% if (list.length === 0) { %>
+            <p class="muted small">No active <%= cat %> resources listed yet.</p>
+          <% } else { %>
+            <ul class="suggestions">
+              <% list.slice(0, 6).forEach(function (res) { %>
+                <li>
+                  <a href="/resources/<%= res._id %>"><%= res.name %></a>
+                  <span class="muted small"><%= [res.type, res.hours].filter(Boolean).join(' · ') %></span>
+                </li>
+              <% }) %>
+            </ul>
+          <% } %>
+        </div>
+      <% }) %>
+    </section>
+  </aside>
+</div>
+
+<%- include('../partials/footer') %>

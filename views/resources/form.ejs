@@ -1,0 +1,115 @@
+<%- include('../partials/header') %>
+
+<% var isEdit = !!resource._id; %>
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="/">Dashboard</a><span>/</span><a href="/resources">Resources</a><span>/</span>
+  <% if (isEdit) { %><a href="/resources/<%= resource._id %>"><%= resource.name || 'Resource' %></a><span>/</span><span aria-current="page">Edit</span>
+  <% } else { %><span aria-current="page">Add</span><% } %>
+</nav>
+
+<div class="page-head">
+  <div>
+    <h1><%= title %></h1>
+    <p class="muted">Fields marked <span class="req">*</span> are required. Keep details current so volunteers can refer people correctly.</p>
+  </div>
+</div>
+
+<div class="form-layout">
+  <form method="POST" action="<%= action %>" class="panel form">
+    <%- include('../partials/errors', { errors }) %>
+
+    <fieldset>
+      <legend><span class="step">1</span> Basic information</legend>
+      <label class="field">
+        <span class="field-label">Name <span class="req">*</span></span>
+        <input name="name" required maxlength="120" value="<%= resource.name || '' %>" placeholder="e.g. Eastside Community Food Bank">
+      </label>
+      <div class="row">
+        <label class="field">
+          <span class="field-label">Category <span class="req">*</span></span>
+          <select name="category" required>
+            <option value="food" <%= resource.category === 'food' ? 'selected' : '' %>>Food</option>
+            <option value="financial" <%= resource.category === 'financial' ? 'selected' : '' %>>Financial</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">Type</span>
+          <input name="type" maxlength="60" list="resource-types" placeholder="e.g. Food Bank, Rent Assistance" value="<%= resource.type || '' %>">
+          <datalist id="resource-types">
+            <option value="Food Bank"><option value="Food Pantry"><option value="Meal Program"><option value="Community Kitchen">
+            <option value="Rent Assistance"><option value="Utility Help"><option value="Emergency Cash Grant"><option value="Financial Counselling">
+          </datalist>
+        </label>
+      </div>
+      <label class="field">
+        <span class="field-label">Description</span>
+        <textarea name="description" rows="3" maxlength="1000" data-counter placeholder="What does this resource provide?"><%= resource.description || '' %></textarea>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="step">2</span> Location &amp; hours</legend>
+      <label class="field">
+        <span class="field-label">Address</span>
+        <input name="address" maxlength="200" value="<%= resource.address || '' %>">
+      </label>
+      <div class="row">
+        <label class="field">
+          <span class="field-label">Service area</span>
+          <input name="serviceArea" maxlength="120" placeholder="e.g. Eastside & Downtown" value="<%= resource.serviceArea || '' %>">
+        </label>
+        <label class="field">
+          <span class="field-label">Opening hours</span>
+          <input name="hours" maxlength="120" placeholder="e.g. Mon–Fri 9am–5pm" value="<%= resource.hours || '' %>">
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="step">3</span> Contact</legend>
+      <div class="row">
+        <label class="field">
+          <span class="field-label">Phone</span>
+          <input type="tel" name="phone" maxlength="30" value="<%= resource.phone || '' %>">
+        </label>
+        <label class="field">
+          <span class="field-label">Email</span>
+          <input type="email" name="email" maxlength="120" value="<%= resource.email || '' %>">
+        </label>
+      </div>
+      <label class="field">
+        <span class="field-label">Website</span>
+        <input type="url" name="website" maxlength="200" placeholder="https://" value="<%= resource.website || '' %>">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="step">4</span> Eligibility &amp; availability</legend>
+      <label class="field">
+        <span class="field-label">Eligibility</span>
+        <textarea name="eligibility" rows="2" maxlength="500" data-counter placeholder="Who qualifies and what should they bring?"><%= resource.eligibility || '' %></textarea>
+      </label>
+      <label class="switch">
+        <input type="checkbox" name="isActive" <%= resource.isActive ? 'checked' : '' %>>
+        <span class="switch-ui"></span>
+        <span>Currently active and accepting people</span>
+      </label>
+    </fieldset>
+
+    <div class="form-actions">
+      <button class="btn" type="submit"><%- icon('check') %> <%= isEdit ? 'Save changes' : 'Add resource' %></button>
+      <a href="<%= isEdit ? '/resources/' + resource._id : '/resources' %>" class="btn btn-ghost">Cancel</a>
+    </div>
+  </form>
+
+  <aside class="panel form-aside">
+    <h2><%- icon('info') %> Tips</h2>
+    <ul class="tips">
+      <li>Use <strong>Type</strong> to describe the service, such as "Food Pantry" or "Utility Help".</li>
+      <li>Spell out eligibility rules and documents people need, so nobody makes a wasted trip.</li>
+      <li>Mark a resource <strong>inactive</strong> instead of deleting it if it's closed for now. It stays in the history, but you can't assign new requests to it.</li>
+    </ul>
+  </aside>
+</div>
+
+<%- include('../partials/footer') %>

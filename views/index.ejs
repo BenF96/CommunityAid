@@ -1,0 +1,232 @@
+<%- include('partials/header') %>
+
+<div class="page-head">
+  <div>
+    <p class="eyebrow"><time data-live-date datetime="<%= new Date().toISOString() %>"><%= dateTime(new Date()) %></time></p>
+    <h1>Dashboard</h1>
+    <p class="muted">Overview of food and financial assistance across the community.</p>
+  </div>
+  <div class="actions">
+    <a href="/requests/new" class="btn"><%- icon('plus') %> New request</a>
+    <a href="/resources/new" class="btn btn-ghost"><%- icon('pin') %> Add resource</a>
+    <a href="/requests/export.csv" class="btn btn-ghost"><%- icon('download') %> Export</a>
+  </div>
+</div>
+
+<% if (d.status.total === 0 && d.resources.food + d.resources.financial === 0) { %>
+  <section class="panel callout">
+    <%- icon('info') %>
+    <div>
+      <strong>Welcome! The system is empty.</strong>
+      <p class="muted">Start by adding the food banks and financial aid programs in your area, then log the first request.</p>
+      <div class="actions">
+        <a href="/resources/new" class="btn btn-small"><%- icon('plus') %> Add your first resource</a>
+        <a href="/requests/new" class="btn btn-small btn-ghost"><%- icon('inbox') %> Log a request</a>
+      </div>
+    </div>
+  </section>
+<% } %>
+
+<!-- KPI cards -->
+<section class="kpis">
+  <a class="kpi" href="/requests?status=open">
+    <span class="kpi-icon tone-blue"><%- icon('inbox') %></span>
+    <span class="kpi-label">Open requests</span>
+    <span class="kpi-value"><%= d.status.open %></span>
+    <span class="kpi-sub"><%= d.status.pending %> pending · <%= d.status.inProgress %> in progress</span>
+  </a>
+  <a class="kpi" href="/requests?status=open&urgency=3">
+    <span class="kpi-icon tone-red"><%- icon('alert') %></span>
+    <span class="kpi-label">Urgent &amp; open</span>
+    <span class="kpi-value"><%= d.urgency.high %></span>
+    <span class="kpi-sub">High urgency, not yet fulfilled</span>
+  </a>
+  <div class="kpi">
+    <span class="kpi-icon tone-amber"><%- icon('users') %></span>
+    <span class="kpi-label">People waiting</span>
+    <span class="kpi-value"><%= d.people.waiting %></span>
+    <span class="kpi-sub">Household members in open requests</span>
+  </div>
+  <a class="kpi" href="/requests?status=fulfilled">
+    <span class="kpi-icon tone-green"><%- icon('heart') %></span>
+    <span class="kpi-label">People helped</span>
+    <span class="kpi-value"><%= d.people.helped %></span>
+    <span class="kpi-sub">Across <%= d.status.fulfilled %> fulfilled request<%= d.status.fulfilled === 1 ? '' : 's' %></span>
+  </a>
+  <a class="kpi" href="/requests?status=open&aidType=financial">
+    <span class="kpi-icon tone-blue"><%- icon('money') %></span>
+    <span class="kpi-label">Financial aid requested</span>
+    <span class="kpi-value"><%= money(d.amount.open) %></span>
+    <span class="kpi-sub">Total of open financial requests</span>
+  </a>
+  <div class="kpi">
+    <span class="kpi-icon tone-green"><%- icon('check') %></span>
+    <span class="kpi-label">Financial aid fulfilled</span>
+    <span class="kpi-value"><%= money(d.amount.fulfilled) %></span>
+    <span class="kpi-sub">Amount covered so far</span>
+  </div>
+  <div class="kpi">
+    <span class="kpi-icon tone-violet"><%- icon('clock') %></span>
+    <span class="kpi-label">Avg. time to fulfil</span>
+    <span class="kpi-value"><%= d.avgDaysToFulfil == null ? '-' : d.avgDaysToFulfil < 1 ? '< 1 day' : d.avgDaysToFulfil.toFixed(1) + ' days' %></span>
+    <span class="kpi-sub">From submission to fulfilled</span>
+  </div>
+  <a class="kpi" href="/resources?state=active">
+    <span class="kpi-icon tone-teal"><%- icon('pin') %></span>
+    <span class="kpi-label">Active resources</span>
+    <span class="kpi-value"><%= d.resources.active %></span>
+    <span class="kpi-sub"><%= d.resources.food %> food · <%= d.resources.financial %> financial<%= d.resources.inactive ? ' · ' + d.resources.inactive + ' inactive' : '' %></span>
+  </a>
+</section>
+
+<div class="grid-2">
+  <!-- Pipeline -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2><%- icon('activity') %> Request pipeline</h2>
+      <span class="muted small"><%= d.status.total %> total</span>
+    </div>
+    <% if (d.status.total) { %>
+      <div class="stacked" role="img" aria-label="<%= d.status.pending %> pending, <%= d.status.inProgress %> in progress, <%= d.status.fulfilled %> fulfilled">
+        <span class="seg seg-pending" style="width: <%= pct(d.status.pending, d.status.total) %>%"></span>
+        <span class="seg seg-progress" style="width: <%= pct(d.status.inProgress, d.status.total) %>%"></span>
+        <span class="seg seg-fulfilled" style="width: <%= pct(d.status.fulfilled, d.status.total) %>%"></span>
+      </div>
+      <ul class="legend">
+        <li><a href="/requests?status=pending"><span class="dot seg-pending"></span>Pending <strong><%= d.status.pending %></strong> <span class="muted">(<%= pct(d.status.pending, d.status.total) %>%)</span></a></li>
+        <li><a href="/requests?status=in-progress"><span class="dot seg-progress"></span>In progress <strong><%= d.status.inProgress %></strong> <span class="muted">(<%= pct(d.status.inProgress, d.status.total) %>%)</span></a></li>
+        <li><a href="/requests?status=fulfilled"><span class="dot seg-fulfilled"></span>Fulfilled <strong><%= d.status.fulfilled %></strong> <span class="muted">(<%= pct(d.status.fulfilled, d.status.total) %>%)</span></a></li>
+      </ul>
+    <% } else { %>
+      <p class="muted">No requests yet.</p>
+    <% } %>
+
+    <h3 class="subhead">Open requests by urgency</h3>
+    <% var urgMax = Math.max(1, d.urgency.high, d.urgency.medium, d.urgency.low); %>
+    <div class="hbars">
+      <% [['High', d.urgency.high, 'u3', 3], ['Medium', d.urgency.medium, 'u2', 2], ['Low', d.urgency.low, 'u1', 1]].forEach(function (u) { %>
+        <a class="hbar" href="/requests?status=open&urgency=<%= u[3] %>">
+          <span class="hbar-label"><%= u[0] %></span>
+          <span class="hbar-track"><span class="hbar-fill fill-<%= u[2] %>" style="width: <%= pct(u[1], urgMax) %>%"></span></span>
+          <span class="hbar-value"><%= u[1] %></span>
+        </a>
+      <% }) %>
+    </div>
+  </section>
+
+  <!-- By type -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2><%- icon('chart') %> Requests by type of aid</h2>
+    </div>
+    <div class="type-cards">
+      <% [['food', 'Food', 'food'], ['financial', 'Financial', 'money']].forEach(function (t) { var s = d.byType[t[0]]; %>
+        <div class="type-card type-<%= t[0] %>">
+          <div class="type-card-head"><%- icon(t[2]) %><strong><%= t[1] %></strong></div>
+          <div class="type-card-value"><%= s.total %> <small>requests</small></div>
+          <div class="progress" title="<%= pct(s.fulfilled, s.total) %>% fulfilled">
+            <span style="width: <%= pct(s.fulfilled, s.total) %>%"></span>
+          </div>
+          <div class="type-card-meta">
+            <a href="/requests?aidType=<%= t[0] %>&status=open"><%= s.open %> open</a>
+            <span><%= pct(s.fulfilled, s.total) %>% fulfilled</span>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <h3 class="subhead">New requests &mdash; last <%= d.daily.length %> days <span class="muted small">(<%= d.dailyTotal %> total)</span></h3>
+    <div class="columns" role="img" aria-label="Requests submitted per day over the last <%= d.daily.length %> days">
+      <% d.daily.forEach(function (day, i) { %>
+        <div class="col" title="<%= date(day.date) %>: <%= day.n %> request<%= day.n === 1 ? '' : 's' %>">
+          <span class="col-value"><%= day.n || '' %></span>
+          <span class="col-bar" style="height: <%= Math.max(day.n ? 6 : 2, pct(day.n, d.dailyMax)) %>%"></span>
+          <span class="col-label"><%= (i % 2 === 0 || i === d.daily.length - 1) ? day.date.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', timeZone: 'UTC' }) : '' %></span>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+</div>
+
+<div class="grid-2 grid-wide-left">
+  <!-- Needs attention -->
+  <section class="panel">
+    <div class="panel-head">
+      <h2><%- icon('alert') %> Needs attention</h2>
+      <a href="/requests?status=open" class="small">View all open &rarr;</a>
+    </div>
+    <% if (d.needsAttention.length === 0) { %>
+      <div class="empty"><%- icon('check') %><p>No open requests. Great work!</p></div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table class="table responsive">
+          <thead><tr><th>Requester</th><th>Need</th><th>Urgency</th><th>Status</th><th>Waiting</th></tr></thead>
+          <tbody>
+          <% d.needsAttention.forEach(function (r) { %>
+            <tr>
+              <td data-label="Requester">
+                <a href="/requests/<%= r._id %>" class="strong"><%= r.fullName %></a>
+                <div class="muted small mono"><%= r.refCode %></div>
+              </td>
+              <td data-label="Need">
+                <span class="tag tag-<%= r.aidType %>"><%= r.aidType %></span>
+                <% if (r.amountNeeded != null) { %><span class="small"><%= money(r.amountNeeded) %></span><% } %>
+                <div class="muted small"><%= truncate(r.description, 60) %></div>
+              </td>
+              <td data-label="Urgency"><span class="urgency u<%= r.urgency %>"><%= r.urgencyLabel %></span></td>
+              <td data-label="Status"><span class="status s-<%= r.status %>"><%= statusLabel(r.status) %></span></td>
+              <td data-label="Waiting"><strong><%= r.daysOpen %></strong> day<%= r.daysOpen === 1 ? '' : 's' %></td>
+            </tr>
+          <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+
+  <!-- Activity -->
+  <section class="panel">
+    <div class="panel-head"><h2><%- icon('list') %> Recent activity</h2></div>
+    <% if (d.activity.length === 0) { %>
+      <p class="muted">No activity yet.</p>
+    <% } else { %>
+      <ol class="timeline compact">
+        <% d.activity.forEach(function (a) { %>
+          <li class="tl-<%= a.history.action %>">
+            <span class="tl-dot"></span>
+            <div>
+              <a href="/requests/<%= a._id %>"><%= a.fullName %></a>
+              <span class="muted small mono"><%= a.ref || '' %></span>
+              <div class="small"><%= a.history.detail %></div>
+              <div class="muted small"><%= timeAgo(a.history.at) %></div>
+            </div>
+          </li>
+        <% }) %>
+      </ol>
+    <% } %>
+  </section>
+</div>
+
+<!-- Resource usage -->
+<section class="panel">
+  <div class="panel-head">
+    <h2><%- icon('pin') %> Most-used resources</h2>
+    <a href="/resources" class="small">All resources &rarr;</a>
+  </div>
+  <% if (d.topResources.length === 0) { %>
+    <p class="muted">No requests have been assigned to a resource yet. Open a request and assign it to track which resources are helping most.</p>
+  <% } else { %>
+    <% var topMax = d.topResources[0].total; %>
+    <div class="hbars">
+      <% d.topResources.forEach(function (t) { %>
+        <a class="hbar wide" href="/resources/<%= t._id %>">
+          <span class="hbar-label"><span class="tag tag-<%= t.resource.category %>"><%= t.resource.category %></span> <%= t.resource.name %></span>
+          <span class="hbar-track"><span class="hbar-fill fill-brand" style="width: <%= pct(t.total, topMax) %>%"></span></span>
+          <span class="hbar-value"><%= t.total %> <span class="muted small">(<%= t.open %> open)</span></span>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<%- include('partials/footer') %>

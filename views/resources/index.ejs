@@ -1,0 +1,103 @@
+<%- include('../partials/header') %>
+
+<div class="page-head">
+  <div>
+    <h1>Community Resources</h1>
+    <p class="muted">Food banks, meal programs and financial assistance available to residents.</p>
+  </div>
+  <div class="actions">
+    <a href="/resources/new<%= category ? '?category=' + category : '' %>" class="btn"><%- icon('plus') %> Add resource</a>
+  </div>
+</div>
+
+<nav class="tabs" aria-label="Resource categories">
+  <a href="/resources" class="tab <%= !category ? 'active' : '' %>">All <span class="badge"><%= nav.resources %></span></a>
+  <a href="/resources?category=food" class="tab <%= category === 'food' ? 'active' : '' %>"><%- icon('food') %> Food <span class="badge"><%= nav.food %></span></a>
+  <a href="/resources?category=financial" class="tab <%= category === 'financial' ? 'active' : '' %>"><%- icon('money') %> Financial <span class="badge"><%= nav.financial %></span></a>
+</nav>
+
+<form class="filters panel" method="GET" action="/resources">
+  <label class="field grow">
+    <span class="sr-only">Search</span>
+    <input type="search" name="q" value="<%= q %>" placeholder="Search by name, type, area or address…">
+  </label>
+  <% var activeFilters = [category, state, sort !== 'name' ? sort : ''].filter(Boolean).length; %>
+  <button type="button" class="btn btn-ghost filter-toggle" data-action="toggle-filters" aria-expanded="false">
+    <%- icon('list') %> Filters<% if (activeFilters) { %> <span class="badge"><%= activeFilters %></span><% } %>
+  </button>
+  <label class="field">
+    <span class="field-label">Category</span>
+    <select name="category">
+      <option value="">All</option>
+      <option value="food" <%= category === 'food' ? 'selected' : '' %>>Food</option>
+      <option value="financial" <%= category === 'financial' ? 'selected' : '' %>>Financial</option>
+    </select>
+  </label>
+  <label class="field">
+    <span class="field-label">Status</span>
+    <select name="state">
+      <option value="">Any</option>
+      <option value="active" <%= state === 'active' ? 'selected' : '' %>>Active</option>
+      <option value="inactive" <%= state === 'inactive' ? 'selected' : '' %>>Inactive</option>
+    </select>
+  </label>
+  <label class="field">
+    <span class="field-label">Sort by</span>
+    <select name="sort">
+      <option value="name" <%= sort === 'name' ? 'selected' : '' %>>Name (A–Z)</option>
+      <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest</option>
+      <option value="updated" <%= sort === 'updated' ? 'selected' : '' %>>Recently updated</option>
+    </select>
+  </label>
+  <div class="filter-actions">
+    <button class="btn" type="submit"><%- icon('search') %> Apply</button>
+    <% if (q || category || state || sort !== 'name') { %><a href="/resources" class="btn btn-ghost">Reset</a><% } %>
+  </div>
+</form>
+
+<p class="results-meta">
+  <% if (pg.total) { %>Showing <strong><%= pg.from %>–<%= pg.to %></strong> of <strong><%= pg.total %></strong> resource<%= pg.total === 1 ? '' : 's' %><% } %>
+  <% if (q) { %> matching &ldquo;<%= q %>&rdquo;<% } %>
+</p>
+
+<% if (resources.length === 0) { %>
+  <section class="panel empty">
+    <%- icon('pin') %>
+    <p><strong>No resources found.</strong></p>
+    <p class="muted"><%= q || category || state ? 'Try changing your search or filters.' : 'Add the first food or financial resource for your community.' %></p>
+    <a href="/resources/new" class="btn"><%- icon('plus') %> Add resource</a>
+  </section>
+<% } else { %>
+  <div class="card-grid">
+    <% resources.forEach(function (r) { var u = usageById[String(r._id)] || { total: 0, open: 0 }; %>
+      <article class="resource-card <%= r.isActive ? '' : 'inactive' %>">
+        <div class="resource-card-top cat-<%= r.category %>">
+          <span class="tag tag-<%= r.category %>"><%- icon(r.category === 'food' ? 'food' : 'money') %> <%= r.category %></span>
+          <span class="state <%= r.isActive ? 'state-on' : 'state-off' %>"><%= r.isActive ? 'Active' : 'Inactive' %></span>
+        </div>
+        <div class="resource-card-body">
+          <h3><a href="/resources/<%= r._id %>"><%= r.name %></a></h3>
+          <% if (r.type) { %><p class="muted small"><%= r.type %></p><% } %>
+          <% if (r.description) { %><p class="small"><%= truncate(r.description, 110) %></p><% } %>
+          <ul class="meta-list">
+            <% if (r.address) { %><li><%- icon('pin') %><span><%= r.address %></span></li><% } %>
+            <% if (r.hours) { %><li><%- icon('clock') %><span><%= r.hours %></span></li><% } %>
+            <% if (r.phone) { %><li><%- icon('phone') %><a href="tel:<%= r.phone %>"><%= r.phone %></a></li><% } %>
+            <% if (r.serviceArea) { %><li><%- icon('globe') %><span><%= r.serviceArea %></span></li><% } %>
+          </ul>
+        </div>
+        <div class="resource-card-foot">
+          <span class="small muted"><strong><%= u.open %></strong> open · <%= u.total %> total requests</span>
+          <span class="card-actions">
+            <a href="/resources/<%= r._id %>/edit" class="icon-btn" aria-label="Edit <%= r.name %>" title="Edit"><%- icon('edit') %></a>
+            <a href="/resources/<%= r._id %>" class="btn btn-small btn-ghost">Details</a>
+          </span>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('../partials/pagination') %>
+
+<%- include('../partials/footer') %>

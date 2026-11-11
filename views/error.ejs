@@ -1,0 +1,12 @@
+<%- include('partials/header') %>
+<section class="panel empty-page">
+  <div class="empty-icon"><%- icon(status === 404 ? 'search' : 'alert') %></div>
+  <p class="eyebrow">Error <%= typeof status !== 'undefined' ? status : '' %></p>
+  <h1><%= title %></h1>
+  <p class="muted"><%= message %></p>
+  <div class="actions center">
+    <a href="/" class="btn"><%- icon('dashboard') %> Go to dashboard</a>
+    <a href="/resources" class="btn btn-ghost"><%- icon('pin') %> Browse resources</a>
+  </div>
+</section>
+<%- include('partials/footer') %>

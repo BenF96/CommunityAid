@@ -1,0 +1,118 @@
+<%- include('../partials/header') %>
+
+<div class="page-head">
+  <div>
+    <h1>Aid Requests</h1>
+    <p class="muted">Track every request from submission to fulfilment.</p>
+  </div>
+  <div class="actions">
+    <a href="/requests/export.csv<%= exportQuery ? '?' + exportQuery : '' %>" class="btn btn-ghost"><%- icon('download') %> Export CSV</a>
+    <a href="/requests/new" class="btn"><%- icon('plus') %> New request</a>
+  </div>
+</div>
+
+<nav class="tabs" aria-label="Request status">
+  <a href="/requests" class="tab <%= !status ? 'active' : '' %>">All <span class="badge"><%= nav.requests %></span></a>
+  <a href="/requests?status=open" class="tab <%= status === 'open' ? 'active' : '' %>">Open <span class="badge"><%= nav.pending + nav.inProgress %></span></a>
+  <a href="/requests?status=pending" class="tab <%= status === 'pending' ? 'active' : '' %>"><%- icon('clock') %> Pending <span class="badge"><%= nav.pending %></span></a>
+  <a href="/requests?status=in-progress" class="tab <%= status === 'in-progress' ? 'active' : '' %>"><%- icon('progress') %> In progress <span class="badge"><%= nav.inProgress %></span></a>
+  <a href="/requests?status=fulfilled" class="tab <%= status === 'fulfilled' ? 'active' : '' %>"><%- icon('check') %> Fulfilled <span class="badge"><%= nav.fulfilled %></span></a>
+</nav>
+
+<form class="filters panel" method="GET" action="/requests">
+  <% if (status) { %><input type="hidden" name="status" value="<%= status %>"><% } %>
+  <label class="field grow">
+    <span class="sr-only">Search</span>
+    <input type="search" name="q" value="<%= q %>" placeholder="Search name, reference, phone, email or need…">
+  </label>
+  <% var activeFilters = [aidType, urgency, sort !== 'urgency' ? sort : ''].filter(Boolean).length; %>
+  <button type="button" class="btn btn-ghost filter-toggle" data-action="toggle-filters" aria-expanded="false">
+    <%- icon('list') %> Filters<% if (activeFilters) { %> <span class="badge"><%= activeFilters %></span><% } %>
+  </button>
+  <label class="field">
+    <span class="field-label">Type</span>
+    <select name="aidType">
+      <option value="">All</option>
+      <option value="food" <%= aidType === 'food' ? 'selected' : '' %>>Food</option>
+      <option value="financial" <%= aidType === 'financial' ? 'selected' : '' %>>Financial</option>
+    </select>
+  </label>
+  <label class="field">
+    <span class="field-label">Urgency</span>
+    <select name="urgency">
+      <option value="">Any</option>
+      <option value="3" <%= urgency === '3' ? 'selected' : '' %>>High</option>
+      <option value="2" <%= urgency === '2' ? 'selected' : '' %>>Medium</option>
+      <option value="1" <%= urgency === '1' ? 'selected' : '' %>>Low</option>
+    </select>
+  </label>
+  <label class="field">
+    <span class="field-label">Sort by</span>
+    <select name="sort">
+      <option value="urgency" <%= sort === 'urgency' ? 'selected' : '' %>>Most urgent first</option>
+      <option value="newest" <%= sort === 'newest' ? 'selected' : '' %>>Newest</option>
+      <option value="oldest" <%= sort === 'oldest' ? 'selected' : '' %>>Oldest</option>
+      <option value="updated" <%= sort === 'updated' ? 'selected' : '' %>>Recently updated</option>
+      <option value="name" <%= sort === 'name' ? 'selected' : '' %>>Name (A–Z)</option>
+    </select>
+  </label>
+  <div class="filter-actions">
+    <button class="btn" type="submit"><%- icon('search') %> Apply</button>
+    <% if (q || aidType || urgency || status || sort !== 'urgency') { %><a href="/requests" class="btn btn-ghost">Reset</a><% } %>
+  </div>
+</form>
+
+<p class="results-meta">
+  <% if (pg.total) { %>Showing <strong><%= pg.from %>–<%= pg.to %></strong> of <strong><%= pg.total %></strong> request<%= pg.total === 1 ? '' : 's' %><% } %>
+  <% if (q) { %> matching &ldquo;<%= q %>&rdquo;<% } %>
+</p>
+
+<section class="panel flush">
+  <% if (requests.length === 0) { %>
+    <div class="empty">
+      <%- icon('inbox') %>
+      <p><strong>No requests found.</strong></p>
+      <p class="muted"><%= q || aidType || urgency || status ? 'Try changing your search or filters.' : 'Use “New request” to log the first one.' %></p>
+    </div>
+  <% } else { %>
+    <div class="table-wrap">
+      <table class="table responsive">
+        <thead>
+          <tr>
+            <th>Reference</th><th>Requester</th><th>Need</th><th>Household</th><th>Urgency</th>
+            <th>Status</th><th>Assigned to</th><th>Submitted</th><th><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+        <% requests.forEach(function (r) { %>
+          <tr>
+            <td data-label="Reference"><a href="/requests/<%= r._id %>" class="mono strong"><%= r.refCode %></a></td>
+            <td data-label="Requester">
+              <a href="/requests/<%= r._id %>" class="strong"><%= r.fullName %></a>
+              <div class="muted small"><%= r.phone || r.email %></div>
+            </td>
+            <td data-label="Need">
+              <span class="tag tag-<%= r.aidType %>"><%= r.aidType %></span>
+              <% if (r.amountNeeded != null) { %><span class="small strong"><%= money(r.amountNeeded) %></span><% } %>
+              <div class="muted small"><%= truncate(r.description, 70) %></div>
+            </td>
+            <td data-label="Household"><%= r.householdSize %></td>
+            <td data-label="Urgency"><span class="urgency u<%= r.urgency %>"><%= r.urgencyLabel %></span></td>
+            <td data-label="Status"><span class="status s-<%= r.status %>"><%= statusLabel(r.status) %></span></td>
+            <td data-label="Assigned to"><%= r.assignedResource ? r.assignedResource.name : '-' %></td>
+            <td data-label="Submitted"><span title="<%= dateTime(r.createdAt) %>"><%= timeAgo(r.createdAt) %></span></td>
+            <td class="row-actions">
+              <a href="/requests/<%= r._id %>/edit" class="icon-btn" aria-label="Edit request <%= r.refCode %>" title="Edit"><%- icon('edit') %></a>
+              <a href="/requests/<%= r._id %>" class="btn btn-small btn-ghost">Open</a>
+            </td>
+          </tr>
+        <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</section>
+
+<%- include('../partials/pagination') %>
+
+<%- include('../partials/footer') %>

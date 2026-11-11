@@ -1,0 +1,21 @@
+<% if (pg.pages > 1) { %>
+  <nav class="pagination" aria-label="Pagination">
+    <% if (pg.page > 1) { %>
+      <a href="<%= pg.link(pg.page - 1) %>" class="page-link" rel="prev"><%- icon('chevronLeft') %> Prev</a>
+    <% } else { %>
+      <span class="page-link disabled"><%- icon('chevronLeft') %> Prev</span>
+    <% } %>
+    <% for (var p = 1; p <= pg.pages; p++) { %>
+      <% if (p === 1 || p === pg.pages || Math.abs(p - pg.page) <= 1) { %>
+        <a href="<%= pg.link(p) %>" class="page-link <%= p === pg.page ? 'current' : '' %>" <%- p === pg.page ? 'aria-current="page"' : '' %>><%= p %></a>
+      <% } else if (Math.abs(p - pg.page) === 2) { %>
+        <span class="page-gap">…</span>
+      <% } %>
+    <% } %>
+    <% if (pg.page < pg.pages) { %>
+      <a href="<%= pg.link(pg.page + 1) %>" class="page-link" rel="next">Next <%- icon('chevronRight') %></a>
+    <% } else { %>
+      <span class="page-link disabled">Next <%- icon('chevronRight') %></span>
+    <% } %>
+  </nav>
+<% } %>

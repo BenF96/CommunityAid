@@ -1,0 +1,92 @@
+<%- include('../partials/header') %>
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <a href="/">Dashboard</a><span>/</span><a href="/resources">Resources</a><span>/</span><span aria-current="page"><%= resource.name %></span>
+</nav>
+
+<div class="page-head">
+  <div>
+    <div class="chips">
+      <span class="tag tag-<%= resource.category %>"><%- icon(resource.category === 'food' ? 'food' : 'money') %> <%= resource.category %></span>
+      <span class="state <%= resource.isActive ? 'state-on' : 'state-off' %>"><%= resource.isActive ? 'Active' : 'Inactive' %></span>
+    </div>
+    <h1><%= resource.name %></h1>
+    <% if (resource.type) { %><p class="muted"><%= resource.type %></p><% } %>
+  </div>
+  <div class="actions">
+    <a href="/requests/new?aidType=<%= resource.category %>&amp;resource=<%= resource._id %>" class="btn"><%- icon('plus') %> Refer someone</a>
+    <a href="/resources/<%= resource._id %>/edit" class="btn btn-ghost"><%- icon('edit') %> Edit</a>
+    <form method="POST" action="/resources/<%= resource._id %>?_method=DELETE"
+          data-confirm="Delete &quot;<%= resource.name %>&quot;? Any requests assigned to it will be unassigned.">
+      <button class="btn btn-danger-ghost" type="submit"><%- icon('trash') %> Delete</button>
+    </form>
+  </div>
+</div>
+
+<div class="grid-2 grid-wide-left">
+  <div>
+    <section class="panel">
+      <div class="panel-head"><h2><%- icon('info') %> About this resource</h2></div>
+      <p><%= resource.description || 'No description provided.' %></p>
+      <% if (resource.eligibility) { %>
+        <div class="callout callout-soft">
+          <%- icon('users') %>
+          <div><strong>Who can use it</strong><p><%= resource.eligibility %></p></div>
+        </div>
+      <% } %>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2><%- icon('inbox') %> Assigned requests</h2>
+        <span class="muted small"><%= summary.total %> total</span>
+      </div>
+      <% if (assigned.length === 0) { %>
+        <p class="muted">No requests are assigned to this resource yet. Assign one from a request's edit page.</p>
+      <% } else { %>
+        <div class="table-wrap">
+          <table class="table responsive">
+            <thead><tr><th>Requester</th><th>Household</th><th>Urgency</th><th>Status</th><th>Submitted</th></tr></thead>
+            <tbody>
+            <% assigned.forEach(function (r) { %>
+              <tr>
+                <td data-label="Requester"><a href="/requests/<%= r._id %>" class="strong"><%= r.fullName %></a><div class="muted small mono"><%= r.refCode %></div></td>
+                <td data-label="Household"><%= r.householdSize %></td>
+                <td data-label="Urgency"><span class="urgency u<%= r.urgency %>"><%= r.urgencyLabel %></span></td>
+                <td data-label="Status"><span class="status s-<%= r.status %>"><%= statusLabel(r.status) %></span></td>
+                <td data-label="Submitted"><%= date(r.createdAt) %></td>
+              </tr>
+            <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </section>
+  </div>
+
+  <div>
+    <section class="panel">
+      <div class="panel-head"><h2><%- icon('phone') %> Contact &amp; location</h2></div>
+      <ul class="meta-list large">
+        <li><%- icon('pin') %><div><span class="meta-k">Address</span><span><%= resource.address || '-' %></span></div></li>
+        <li><%- icon('globe') %><div><span class="meta-k">Service area</span><span><%= resource.serviceArea || '-' %></span></div></li>
+        <li><%- icon('clock') %><div><span class="meta-k">Hours</span><span><%= resource.hours || '-' %></span></div></li>
+        <li><%- icon('phone') %><div><span class="meta-k">Phone</span><% if (resource.phone) { %><a href="tel:<%= resource.phone %>"><%= resource.phone %></a><% } else { %><span>-</span><% } %></div></li>
+        <li><%- icon('mail') %><div><span class="meta-k">Email</span><% if (resource.email) { %><a href="mailto:<%= resource.email %>"><%= resource.email %></a><% } else { %><span>-</span><% } %></div></li>
+        <li><%- icon('globe') %><div><span class="meta-k">Website</span><% if (resource.website) { %><a href="<%= resource.website %>" target="_blank" rel="noopener noreferrer"><%= resource.website %></a><% } else { %><span>-</span><% } %></div></li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head"><h2><%- icon('chart') %> Impact</h2></div>
+      <div class="mini-stats">
+        <div><span class="mini-value"><%= summary.open %></span><span class="mini-label">Open</span></div>
+        <div><span class="mini-value"><%= summary.fulfilled %></span><span class="mini-label">Fulfilled</span></div>
+        <div><span class="mini-value"><%= summary.people %></span><span class="mini-label">People helped</span></div>
+      </div>
+      <p class="muted small">Added <%= date(resource.createdAt) %> · Updated <%= timeAgo(resource.updatedAt) %></p>
+    </section>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
