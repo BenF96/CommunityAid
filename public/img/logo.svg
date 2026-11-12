@@ -1,35 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="CommunityAid">
   <defs>
     <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#121a24"/>
-      <stop offset="1" stop-color="#05070a"/>
+      <stop offset="0" stop-color="#262058"/>
+      <stop offset="1" stop-color="#110f2a"/>
     </linearGradient>
-    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#00e5ff"/>
-      <stop offset="0.6" stop-color="#00a8c6" stop-opacity="0.5"/>
-      <stop offset="1" stop-color="#ff2bd6"/>
-    </linearGradient>
-    <linearGradient id="heart" x1="0.15" y1="0.1" x2="0.85" y2="1">
-      <stop offset="0" stop-color="#5ff0ff"/>
-      <stop offset="0.55" stop-color="#00c8e6"/>
-      <stop offset="1" stop-color="#ff2bd6"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="0.5" cy="0.55" r="0.5">
-      <stop offset="0" stop-color="#00e5ff" stop-opacity="0.35"/>
-      <stop offset="1" stop-color="#00e5ff" stop-opacity="0"/>
-    </radialGradient>
   </defs>
 
-  <!-- Dark tile with a cyan-to-magenta rim -->
-  <rect x="1.5" y="1.5" width="61" height="61" rx="15" fill="url(#tile)" stroke="url(#edge)" stroke-width="2"/>
-  <circle cx="32" cy="35" r="24" fill="url(#glow)"/>
+  <!-- Solid indigo-black tile with a darker base edge for depth -->
+  <rect x="0" y="2" width="64" height="62" rx="15" fill="#05040e"/>
+  <rect x="0" y="0" width="64" height="61" rx="15" fill="url(#tile)"/>
+  <rect x="0.75" y="0.75" width="62.5" height="59.5" rx="14.25" fill="none" stroke="#efe9dc" stroke-opacity="0.12" stroke-width="1.5"/>
 
-  <!-- Heart -->
-  <path d="M32 51.5 15.6 35.4a10.6 10.6 0 0 1 15-15L32 21.8l1.4-1.4a10.6 10.6 0 0 1 15 15Z"
-        fill="url(#heart)"/>
-  <!-- Highlight on the heart's top-left lobe for depth -->
-  <path d="M19.2 23.6a6.6 6.6 0 0 1 8.4-.8" fill="none" stroke="#ffffff" stroke-opacity="0.55" stroke-width="2" stroke-linecap="round"/>
+  <!-- Bone heart with a drop shadow -->
+  <path d="M32 52.5 15.6 36.4a10.6 10.6 0 0 1 15-15L32 22.8l1.4-1.4a10.6 10.6 0 0 1 15 15Z" fill="#000000" fill-opacity="0.45"/>
+  <path d="M32 50.5 15.6 34.4a10.6 10.6 0 0 1 15-15L32 20.8l1.4-1.4a10.6 10.6 0 0 1 15 15Z" fill="#efe9dc"/>
 
-  <!-- Aid cross cut into the heart -->
-  <path d="M29.6 27.5h4.8v5.1h5.1v4.8h-5.1v5.1h-4.8v-5.1h-5.1v-4.8h5.1Z" fill="#05070a"/>
+  <!-- Amber aid cross -->
+  <path d="M29.6 26.5h4.8v5.1h5.1v4.8h-5.1v5.1h-4.8v-5.1h-5.1v-4.8h5.1Z" fill="#f5a524"/>
 </svg>
