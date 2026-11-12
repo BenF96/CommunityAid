@@ -985,6 +985,76 @@ a.figure:active { transform: translateY(1px); box-shadow: inset 0 2px 6px rgba(0
   .figure-value { margin-top: 8px; }
 }
 
+/* ==========================================================================
+   Solid bone canvas: indigo-black frame (sidebar, top bar) and tiles
+   sit on a flat bone page; anything placed directly on the page uses ink
+   ========================================================================== */
+:root {
+  --canvas: #e9e2d3;
+  --canvas-ink: #0b0a1a;
+  --canvas-muted: #5f5874;
+  --canvas-line: #cfc5b1;
+  /* Shadows cast onto bone are indigo-tinted, not grey */
+  --raise:
+    inset 0 1px 0 var(--edge-light),
+    inset 0 -1px 0 rgba(0, 0, 0, .35),
+    0 1px 1px rgba(22, 19, 58, .35),
+    0 4px 8px -2px rgba(22, 19, 58, .22),
+    0 18px 30px -16px rgba(22, 19, 58, .55);
+}
+html, body { background: var(--canvas); background-image: none; }
+.shell { background: var(--canvas); }
+
+/* Frame: solid indigo black */
+.topbar { background: #0b0a1a; backdrop-filter: none; color: var(--text); }
+.topbar .hamburger { color: var(--text); }
+
+/* Page-level text and controls on bone */
+.content { color: var(--canvas-ink); }
+.content > .page-head h1, .content > .page-head h2 { color: var(--canvas-ink); }
+.content > .page-head .muted, .results-meta, .page-gap { color: var(--canvas-muted); }
+.breadcrumbs, .breadcrumbs a { color: var(--canvas-muted); }
+.breadcrumbs a:hover { color: var(--canvas-ink); }
+.breadcrumbs [aria-current] { color: var(--canvas-ink); font-weight: 600; }
+.results-meta strong { color: var(--canvas-ink); }
+
+/* Tiles keep their own light-on-dark text */
+.panel, .figure, .resource-card, .flash, .alert, .page-link { color: var(--text); }
+
+/* Primary buttons placed straight on the bone become solid ink keys */
+.content > .page-head .btn:not(.btn-ghost):not(.btn-danger-ghost) {
+  background: var(--canvas-ink); color: var(--bone);
+  box-shadow: inset 0 1px 0 rgba(239, 233, 220, .12), 0 2px 0 #000, 0 4px 8px -2px rgba(22, 19, 58, .45);
+}
+.content > .page-head .btn:not(.btn-ghost):not(.btn-danger-ghost):hover { background: #1a1738; color: var(--bone); }
+.content > .page-head .btn:not(.btn-ghost):not(.btn-danger-ghost):active { box-shadow: inset 0 2px 3px rgba(0, 0, 0, .5); }
+.content > .page-head .btn-ghost { box-shadow: inset 0 1px 0 var(--edge-light), 0 2px 0 #000, 0 4px 8px -2px rgba(22, 19, 58, .4); }
+.content > .page-head .btn-danger-ghost { color: #a3271b; border-color: rgba(163, 39, 27, .45); }
+.content > .page-head .btn-danger-ghost:hover { background: #a3271b; color: var(--bone); }
+
+/* Tabs on bone */
+.tabs { border-bottom-color: var(--canvas-line); box-shadow: none; }
+.tab { color: var(--canvas-muted); }
+.tab:hover { color: var(--canvas-ink); }
+.tab.active { color: var(--canvas-ink); border-bottom-color: var(--amber-deep); text-shadow: none; }
+.tab .badge { background: rgba(11, 10, 26, .08); color: var(--canvas-muted); box-shadow: none; }
+.tab.active .badge { background: var(--canvas-ink); color: var(--amber); }
+
+/* Pagination: dark keys on bone, current page in amber */
+.page-link { box-shadow: 0 2px 0 #000, 0 3px 6px -2px rgba(22, 19, 58, .4); }
+.page-link.current { background: var(--amber); border-color: var(--amber); color: var(--canvas-ink); box-shadow: 0 2px 0 #9a5f06; }
+
+/* Flash messages become solid tiles so they read on bone */
+.flash, .alert { background: var(--surface); box-shadow: var(--raise); border-color: #1d1a40; }
+.flash-success { box-shadow: var(--raise), inset 3px 0 0 var(--done-fill); }
+.flash-error, .alert { box-shadow: var(--raise), inset 3px 0 0 var(--high-fill); }
+.flash-success { color: var(--text); }
+.flash-error, .alert { color: var(--high-text); }
+
+/* Footer on bone */
+.app-footer { color: var(--canvas-muted); border-top-color: var(--canvas-line); }
+.app-footer a { color: var(--canvas-ink); }
+
 /* ---------- Print ---------- */
 @media print {
   .sidebar, .sidebar-backdrop, .topbar, .app-footer, .no-print, .flash, .breadcrumbs { display: none !important; }
