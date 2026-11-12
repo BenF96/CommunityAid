@@ -1,4 +1,4 @@
-// Community Assistance and Resource System - small progressive enhancements. The app works without JavaScript.
+// CommunityAid - small progressive enhancements. The app works without JavaScript.
 (function () {
   'use strict';
 
