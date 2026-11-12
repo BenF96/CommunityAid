@@ -878,6 +878,79 @@ input:focus, select:focus, textarea:focus { box-shadow: var(--sink), 0 0 0 3px r
   * { transition: none !important; }
 }
 
+/* ==========================================================================
+   Spacing: more room inside and between panels and cards
+   (placed after Responsive so its own breakpoints win)
+   ========================================================================== */
+:root { --gap: 24px; --pad: 26px; }
+
+.content { padding: 28px 32px 56px; }
+.page-head { margin-bottom: var(--gap); }
+
+.panel { padding: var(--pad); margin-bottom: var(--gap); }
+.grid-2, .form-layout { gap: var(--gap); }
+.card-grid { gap: 20px; margin-bottom: var(--gap); }
+.figures { margin-bottom: var(--gap); }
+
+/* Panel heading sits on an engraved line: dark groove with a lit lip below */
+.panel-head {
+  padding-bottom: 16px; margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, .55);
+  box-shadow: 0 1px 0 var(--edge-light);
+}
+.subhead { margin: 28px 0 14px; }
+
+.figure { padding: 22px 24px 20px; }
+.figure-value { margin: 8px 0 4px; }
+
+.type-cards { gap: 16px; }
+.type-card { padding: 18px 20px; }
+.type-card-value { margin: 6px 0 12px; }
+.mini-stats { gap: 12px; margin: 10px 0 16px; }
+.mini-stats > div { padding: 14px 16px; }
+
+.resource-card-top { padding: 14px 20px; }
+.resource-card-body { padding: 18px 20px 20px; }
+.resource-card-foot { padding: 12px 20px; }
+
+.table th { padding: 12px 18px; }
+.table td { padding: 14px 18px; }
+.panel.flush .table th:first-child, .panel.flush .table td:first-child { padding-left: var(--pad); }
+.panel.flush .table th:last-child, .panel.flush .table td:last-child { padding-right: var(--pad); }
+.filters { padding: 18px 20px; gap: 14px; }
+.empty { padding: 48px 24px; }
+
+.assigned, .callout-soft { padding: 16px 18px; }
+.form fieldset { margin-bottom: 28px; }
+.form fieldset + fieldset { padding-top: 26px; }
+.form fieldset.staff { padding: 22px 22px 8px; }
+.form-actions { padding-top: 22px; }
+.kv { gap: 8px 18px; margin-top: 18px; }
+.hbars { gap: 12px; }
+.note { padding: 22px var(--pad); }
+
+@media (max-width: 960px) {
+  :root { --gap: 20px; --pad: 22px; }
+  .content { padding: 22px 22px 48px; }
+}
+@media (max-width: 640px) {
+  :root { --gap: 16px; --pad: 18px; }
+  .content { padding: 18px 16px 40px; }
+  .panel { padding: var(--pad); margin-bottom: var(--gap); }
+  .panel-head { padding-bottom: 12px; margin-bottom: 16px; }
+  .figure { padding: 14px 16px; }
+  .type-card { padding: 14px 16px; }
+  .resource-card-top, .resource-card-body, .resource-card-foot { padding-left: 16px; padding-right: 16px; }
+  .table.responsive tr { padding: 14px var(--pad); }
+  .table.responsive td { padding-top: 4px; padding-bottom: 4px; }
+  .panel.flush .table.responsive td:first-child { padding-left: 104px; }
+  .panel.flush .table.responsive td:last-child { padding-right: 0; }
+  .filters { padding: 14px 16px; }
+}
+@media (max-width: 360px) {
+  .panel.flush .table.responsive td:first-child { padding-left: 0; }
+}
+
 /* ---------- Print ---------- */
 @media print {
   .sidebar, .sidebar-backdrop, .topbar, .app-footer, .no-print, .flash, .breadcrumbs { display: none !important; }
