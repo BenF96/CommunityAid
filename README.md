@@ -1,4 +1,4 @@
-# Community Aid Hub
+# Community Assistance and Resource System
 
 An admin console for managing community **food** and **financial** aid requests and resources,
 built with **Node.js**, **Express 5**, **MongoDB** (Mongoose) and server-rendered EJS templates.

@@ -1,4 +1,4 @@
-// Community Aid Hub - small progressive enhancements. The app works without JavaScript.
+// Community Assistance and Resource System - small progressive enhancements. The app works without JavaScript.
 (function () {
   'use strict';
 
