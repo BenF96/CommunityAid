@@ -57,7 +57,7 @@ test('layout has sidebar, hamburger and security headers', async () => {
 test('dashboard shows seeded statistics', async () => {
   const body = await html('/');
   assert.match(body, /Open requests/);
-  assert.match(body, /<time data-live-date datetime="[^"]+">[^<]+<\/time>/);
+  assert.match(body, /<time data-live-date="long" datetime="[^"]+">[^<]+<\/time>/);
   assert.match(body, /James Carter/);
   assert.match(body, /₱1,945\.00/); // open financial requests: 650 + 1200 + 95
   assert.match(body, /₱580\.00/); // fulfilled financial requests: 180 + 400
@@ -79,6 +79,10 @@ test('sidebar highlights the link for the current page', async () => {
 test('sidebar collapsed state is rendered from cookie', async () => {
   const r = await fetch(base + '/', { headers: { cookie: 'sidebar=collapsed' } });
   assert.match(await r.text(), /<body class="sidebar-collapsed">/);
+  // icon rail is the default; an "expanded" cookie opens the full sidebar
+  assert.match(await html('/'), /<body class="sidebar-collapsed">/);
+  const e = await fetch(base + '/', { headers: { cookie: 'sidebar=expanded' } });
+  assert.match(await e.text(), /<body class="">/);
 });
 
 test('resource CRUD with flash messages and validation', async () => {

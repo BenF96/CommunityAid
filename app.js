@@ -64,7 +64,8 @@ app.use(async (req, res, next) => {
   const path = req.path.replace(/\/+$/, '') || '/';
   const query = req.query;
   res.locals.currentPath = path;
-  res.locals.sidebarCollapsed = req.cookies.sidebar === 'collapsed';
+  // Icon rail by default; the hamburger expands it and the choice is remembered
+  res.locals.sidebarCollapsed = req.cookies.sidebar !== 'expanded';
   res.locals.nav = stats.EMPTY_NAV;
 
   res.locals.navLink = (href, iconName, label, count) => {

@@ -3,21 +3,18 @@
 <div class="page-head">
   <div>
     <h1>Dashboard</h1>
-    <p class="muted small"><time data-live-date datetime="<%= new Date().toISOString() %>"><%= dateTime(new Date()) %></time></p>
+    <p class="muted"><%= new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) %>: what's open, what's urgent, and where the aid has gone.</p>
   </div>
   <div class="actions">
     <a href="/resources/new" class="btn btn-ghost">Add resource</a>
-    <a href="/requests/export.csv" class="btn btn-ghost"><%- icon('download') %> Export CSV</a>
+    <a href="/requests/new" class="btn">New request</a>
   </div>
 </div>
 
 <% if (d.status.total === 0 && d.resources.food + d.resources.financial === 0) { %>
   <section class="panel note">
     <p><strong>Nothing here yet.</strong> Add the food banks and aid programs you refer people to, then log requests as they come in.</p>
-    <div class="actions">
-      <a href="/resources/new" class="btn btn-small">Add a resource</a>
-      <a href="/requests/new" class="btn btn-small btn-ghost">Log a request</a>
-    </div>
+    <a href="/requests/export.csv" class="btn btn-small btn-ghost"><%- icon('download') %> Export CSV</a>
   </section>
 <% } %>
 
@@ -25,43 +22,51 @@
 <section class="figures" aria-label="Key figures">
   <a class="figure" href="/requests?status=open">
     <span class="figure-label">Open requests</span>
+    <span class="figure-icon"><%- icon('inbox') %></span>
     <span class="figure-value"><%= d.status.open %></span>
-    <span class="figure-sub"><%= d.status.pending %> pending, <%= d.status.inProgress %> in progress</span>
+    <span class="figure-sub"><%= d.status.pending %> pending · <%= d.status.inProgress %> in progress</span>
   </a>
   <a class="figure<%= d.urgency.high ? ' is-alert' : '' %>" href="/requests?status=open&urgency=3">
     <span class="figure-label">Urgent &amp; open</span>
+    <span class="figure-icon tone-amber"><%- icon('alert') %></span>
     <span class="figure-value"><%= d.urgency.high %></span>
-    <span class="figure-sub">High urgency, not fulfilled</span>
+    <span class="figure-sub"><%= d.urgency.high ? 'High urgency, not yet fulfilled' : 'Nothing urgent right now' %></span>
   </a>
   <div class="figure">
     <span class="figure-label">People waiting</span>
+    <span class="figure-icon"><%- icon('users') %></span>
     <span class="figure-value"><%= d.people.waiting %></span>
-    <span class="figure-sub">Household members, open requests</span>
+    <span class="figure-sub">Household members in open requests</span>
   </div>
   <a class="figure" href="/requests?status=fulfilled">
     <span class="figure-label">People helped</span>
+    <span class="figure-icon"><%- icon('heart') %></span>
     <span class="figure-value"><%= d.people.helped %></span>
     <span class="figure-sub"><%= d.status.fulfilled %> fulfilled request<%= d.status.fulfilled === 1 ? '' : 's' %></span>
   </a>
   <a class="figure" href="/requests?status=open&aidType=financial">
     <span class="figure-label">Financial aid requested</span>
+    <span class="figure-icon"><%- icon('money') %></span>
     <span class="figure-value"><%= money(d.amount.open) %></span>
     <span class="figure-sub">Open financial requests</span>
   </a>
   <div class="figure">
     <span class="figure-label">Financial aid fulfilled</span>
+    <span class="figure-icon"><%- icon('check') %></span>
     <span class="figure-value"><%= money(d.amount.fulfilled) %></span>
     <span class="figure-sub">Covered so far</span>
   </div>
   <div class="figure">
     <span class="figure-label">Avg. time to fulfil</span>
+    <span class="figure-icon"><%- icon('clock') %></span>
     <span class="figure-value"><%= avgDays %></span>
-    <span class="figure-sub">Logged to fulfilled</span>
+    <span class="figure-sub">From logged to fulfilled</span>
   </div>
   <a class="figure" href="/resources?state=active">
     <span class="figure-label">Active resources</span>
+    <span class="figure-icon"><%- icon('pin') %></span>
     <span class="figure-value"><%= d.resources.active %></span>
-    <span class="figure-sub"><%= d.resources.food %> food, <%= d.resources.financial %> financial<%= d.resources.inactive ? ', ' + d.resources.inactive + ' inactive' : '' %></span>
+    <span class="figure-sub"><%= d.resources.food %> food · <%= d.resources.financial %> financial<%= d.resources.inactive ? ' · ' + d.resources.inactive + ' inactive' : '' %></span>
   </a>
 </section>
 
@@ -69,9 +74,11 @@
   <!-- Pipeline -->
   <section class="panel">
     <div class="panel-head">
+      <span class="panel-icon"><%- icon('activity') %></span>
       <h2>Request pipeline</h2>
-      <span class="muted small"><%= d.status.total %> total</span>
+      <span class="panel-meta"><%= d.status.total %></span>
     </div>
+    <p class="panel-desc">Every request by where it stands, and how urgent the open ones are.</p>
     <% if (d.status.total) { %>
       <div class="stacked" role="img" aria-label="<%= d.status.pending %> pending, <%= d.status.inProgress %> in progress, <%= d.status.fulfilled %> fulfilled">
         <span class="seg seg-pending" style="width: <%= pct(d.status.pending, d.status.total) %>%"></span>
@@ -84,7 +91,7 @@
         <li><a href="/requests?status=fulfilled"><span class="dot seg-fulfilled"></span>Fulfilled <strong><%= d.status.fulfilled %></strong> <span class="muted">(<%= pct(d.status.fulfilled, d.status.total) %>%)</span></a></li>
       </ul>
     <% } else { %>
-      <p class="muted">No requests yet.</p>
+      <p class="empty-line"><%- icon('inbox') %> No requests yet.</p>
     <% } %>
 
     <h3 class="subhead">Open requests by urgency</h3>
@@ -103,12 +110,14 @@
   <!-- By type -->
   <section class="panel">
     <div class="panel-head">
+      <span class="panel-icon"><%- icon('chart') %></span>
       <h2>By type of aid</h2>
     </div>
+    <p class="panel-desc">Food and financial requests side by side, and how many have been fulfilled.</p>
     <div class="type-cards">
       <% [['food', 'Food', 'food'], ['financial', 'Financial', 'money']].forEach(function (t) { var s = d.byType[t[0]]; %>
         <div class="type-card type-<%= t[0] %>">
-          <div class="type-card-head"><strong><%= t[1] %></strong></div>
+          <div class="type-card-head"><%- icon(t[2]) %><strong><%= t[1] %></strong></div>
           <div class="type-card-value"><%= s.total %> <small>requests</small></div>
           <div class="progress" title="<%= pct(s.fulfilled, s.total) %>% fulfilled">
             <span style="width: <%= pct(s.fulfilled, s.total) %>%"></span>
@@ -121,8 +130,8 @@
       <% }) %>
     </div>
 
-    <h3 class="subhead">New requests &mdash; last <%= d.daily.length %> days <span class="muted small">(<%= d.dailyTotal %> total)</span></h3>
-    <div class="columns" role="img" aria-label="Requests submitted per day over the last <%= d.daily.length %> days">
+    <h3 class="subhead">New requests, last <%= d.daily.length %> days <span class="muted small">(<%= d.dailyTotal %> total)</span></h3>
+    <div class="columns" role="img" aria-label="Requests logged per day over the last <%= d.daily.length %> days">
       <% d.daily.forEach(function (day, i) { %>
         <div class="col" title="<%= date(day.date) %>: <%= day.n %> request<%= day.n === 1 ? '' : 's' %>">
           <span class="col-value"><%= day.n || '' %></span>
@@ -138,11 +147,13 @@
   <!-- Needs attention -->
   <section class="panel">
     <div class="panel-head">
+      <span class="panel-icon tone-amber"><%- icon('alert') %></span>
       <h2>Needs attention</h2>
-      <a href="/requests?status=open" class="small">All open requests</a>
+      <a href="/requests?status=open" class="panel-link">All open</a>
     </div>
+    <p class="panel-desc">The most urgent and longest-waiting open requests. Assign a resource or update the status from each request.</p>
     <% if (d.needsAttention.length === 0) { %>
-      <p class="muted">No open requests.</p>
+      <p class="empty-line"><%- icon('inbox') %> No open requests.</p>
     <% } else { %>
       <div class="table-wrap">
         <table class="table responsive">
@@ -172,9 +183,13 @@
 
   <!-- Activity -->
   <section class="panel">
-    <div class="panel-head"><h2>Recent activity</h2></div>
+    <div class="panel-head">
+      <span class="panel-icon"><%- icon('list') %></span>
+      <h2>Recent activity</h2>
+    </div>
+    <p class="panel-desc">The latest requests that were logged, moved to a new status, assigned or edited.</p>
     <% if (d.activity.length === 0) { %>
-      <p class="muted">No activity yet.</p>
+      <p class="empty-line"><%- icon('inbox') %> No activity yet.</p>
     <% } else { %>
       <ol class="timeline compact">
         <% d.activity.forEach(function (a) { %>
@@ -196,11 +211,13 @@
 <!-- Resource usage -->
 <section class="panel">
   <div class="panel-head">
+    <span class="panel-icon"><%- icon('pin') %></span>
     <h2>Most-used resources</h2>
-    <a href="/resources" class="small">All resources</a>
+    <a href="/resources" class="panel-link">All resources</a>
   </div>
+  <p class="panel-desc">Resources with the most requests assigned to them, and how many of those are still open.</p>
   <% if (d.topResources.length === 0) { %>
-    <p class="muted">No requests have been assigned to a resource yet.</p>
+    <p class="empty-line"><%- icon('inbox') %> No requests have been assigned to a resource yet.</p>
   <% } else { %>
     <% var topMax = d.topResources[0].total; %>
     <div class="hbars">

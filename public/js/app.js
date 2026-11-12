@@ -132,10 +132,13 @@
   var liveDates = document.querySelectorAll('[data-live-date]');
   if (liveDates.length) {
     var fmt = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' };
+    var longFmt = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     var tick = function () {
       var now = new Date();
       liveDates.forEach(function (el) {
-        el.textContent = now.toLocaleString('en-US', fmt).replace(/, (\d{1,2}:\d{2})/, ' · $1');
+        el.textContent = el.getAttribute('data-live-date') === 'long'
+          ? now.toLocaleDateString('en-US', longFmt)
+          : now.toLocaleString('en-US', fmt).replace(/, (\d{1,2}:\d{2})/, ' · $1');
         el.setAttribute('datetime', now.toISOString());
       });
     };

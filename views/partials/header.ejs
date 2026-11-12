@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#0b0a1a">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#17152c">
   <title><%= title %> | CommunityAid</title>
   <link rel="icon" type="image/svg+xml" href="/img/logo.svg?v=<%= assetVersion %>">
   <link rel="stylesheet" href="/css/style.css?v=<%= assetVersion %>">
@@ -65,12 +65,8 @@
               aria-controls="sidebar" aria-expanded="<%= sidebarCollapsed ? 'false' : 'true' %>" aria-label="Toggle navigation menu">
         <%- icon('menu') %>
       </button>
-      <span class="topbar-title"><%= title %></span>
-      <form class="topbar-search" action="/requests" method="GET" role="search">
-        <%- icon('search') %>
-        <input type="search" name="q" placeholder="Search requests…" aria-label="Search requests by name, reference, phone or email">
-      </form>
-      <a href="/requests/new" class="btn btn-small topbar-cta"><%- icon('plus') %><span>New request</span></a>
+      <a href="/" class="topbar-title"><strong>CommunityAid</strong><span class="topbar-sub"> &middot; Community Assistance and Resources System</span></a>
+      <span class="topbar-date"><%- icon('calendar') %><time data-live-date="long" datetime="<%= new Date().toISOString() %>"><%= new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }) %></time></span>
     </header>
 
     <main id="main" class="content" tabindex="-1">
