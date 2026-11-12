@@ -951,6 +951,40 @@ input:focus, select:focus, textarea:focus { box-shadow: var(--sink), 0 0 0 3px r
   .panel.flush .table.responsive td:first-child { padding-left: 0; }
 }
 
+/* ==========================================================================
+   Figures as separate raised tiles with a gap between them
+   ========================================================================== */
+.figures {
+  gap: 16px;
+  background: none; border: 0; border-radius: 0; box-shadow: none; overflow: visible;
+}
+.figure,
+.figure:nth-child(n) {
+  padding: 20px 22px 18px;
+  border: 1px solid #1d1a40;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, #16132f 0%, var(--surface) 56px);
+  box-shadow: var(--raise);
+}
+/* Small engraved rule between the label and the number */
+.figure-label { padding-bottom: 10px; border-bottom: 1px solid rgba(0, 0, 0, .5); box-shadow: 0 1px 0 var(--edge-light); }
+.figure-value { margin: 12px 0 4px; }
+a.figure { transition: box-shadow .12s, transform .12s, background .12s; }
+a.figure:hover {
+  background: linear-gradient(180deg, #1a1738 0%, #15122d 56px);
+  box-shadow: var(--raise), 0 0 0 1px var(--border-strong);
+}
+a.figure:active { transform: translateY(1px); box-shadow: inset 0 2px 6px rgba(0, 0, 0, .5); }
+.figure.is-alert { box-shadow: var(--raise), inset 3px 0 0 var(--amber); }
+
+@media (max-width: 960px) { .figures { gap: 14px; } }
+@media (max-width: 640px) {
+  .figures { gap: 10px; }
+  .figure, .figure:nth-child(n) { padding: 14px 16px; }
+  .figure-label { padding-bottom: 8px; }
+  .figure-value { margin-top: 8px; }
+}
+
 /* ---------- Print ---------- */
 @media print {
   .sidebar, .sidebar-backdrop, .topbar, .app-footer, .no-print, .flash, .breadcrumbs { display: none !important; }
