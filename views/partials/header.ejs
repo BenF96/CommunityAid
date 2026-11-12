@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#05070a">
   <title><%= title %> | Community Aid Hub Admin</title>
+  <link rel="icon" type="image/svg+xml" href="/img/logo.svg?v=<%= assetVersion %>">
   <link rel="stylesheet" href="/css/style.css?v=<%= assetVersion %>">
   <script src="/js/app.js?v=<%= assetVersion %>" defer></script>
 </head>
@@ -15,7 +16,7 @@
   <aside class="sidebar" id="sidebar" aria-label="Main navigation">
     <div class="sidebar-brand">
       <a href="/" class="brand">
-        <span class="brand-logo"><%- icon('heart') %></span>
+        <img class="brand-logo" src="/img/logo.svg?v=<%= assetVersion %>" alt="" width="38" height="38">
         <span class="brand-text"><strong>Community Aid</strong><small>Admin console</small></span>
       </a>
       <button type="button" class="icon-btn sidebar-close" data-action="close-sidebar" aria-label="Close menu"><%- icon('x') %></button>
