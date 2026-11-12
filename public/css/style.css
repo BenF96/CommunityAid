@@ -572,6 +572,75 @@ input:focus, select:focus, textarea:focus { border-color: var(--indigo-soft); bo
 .req { color: var(--amber); }
 
 /* ==========================================================================
+   Restraint: fewer ornaments, tighter shapes, depth from tone not effects
+   ========================================================================== */
+:root {
+  --radius: 6px;
+  --radius-sm: 4px;
+  --shadow: 0 1px 0 rgba(0, 0, 0, .45), 0 10px 24px -18px rgba(0, 0, 0, .9);
+  --shadow-lift: var(--shadow);
+}
+body { background: var(--bg); }
+h1 { font-size: 1.5rem; font-weight: 650; letter-spacing: -.015em; }
+h2 { font-size: .95rem; font-weight: 650; }
+
+/* Solid, flat buttons */
+.btn, .btn:hover, .btn-ghost, .btn-ghost:hover, .sidebar-cta, .sidebar-cta:hover { box-shadow: none; }
+.btn:active { transform: none; box-shadow: none; filter: brightness(.94); }
+.sidebar-cta { font-weight: 650; }
+
+/* No floating or lifting cards */
+a.kpi:hover, .resource-card:hover { transform: none; box-shadow: var(--shadow); }
+.resource-card:hover { border-color: var(--border-strong); }
+
+/* Tags read as labels, not candy */
+.tag, .status, .urgency, .state { border-radius: 3px; font-weight: 600; padding: 1px 7px; }
+.badge { border-radius: 3px; font-weight: 600; }
+
+/* One primary action per screen: on desktop the sidebar carries "New request" */
+@media (min-width: 961px) { .topbar-cta { display: none; } }
+
+/* Key figures: one ruled sheet instead of eight floating cards */
+.figures {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 20px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.figure {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  padding: 16px 18px 15px;
+  color: var(--text);
+  border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.figure:nth-child(4n) { border-right: 0; }
+.figure:nth-last-child(-n+4) { border-bottom: 0; }
+a.figure:hover { background: var(--surface-2); text-decoration: none; }
+a.figure:hover .figure-label { color: var(--text); }
+.figure-label { font-size: .8rem; color: var(--muted); }
+.figure-value { font-size: 1.65rem; font-weight: 600; letter-spacing: -.02em; line-height: 1.2; margin: 4px 0 2px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.figure-sub { font-size: .76rem; color: var(--muted); }
+.figure.is-alert .figure-value { color: var(--amber); }
+
+.type-card-value, .mini-value, .kpi-value { font-weight: 600; }
+.hbar-fill { min-width: 0; }
+
+.note { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.note p { margin: 0; max-width: 62ch; }
+
+@media (max-width: 1180px) {
+  .figures { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .figure:nth-child(4n) { border-right: 1px solid var(--border); }
+  .figure:nth-child(2n) { border-right: 0; }
+  .figure:nth-last-child(-n+4) { border-bottom: 1px solid var(--border); }
+  .figure:nth-last-child(-n+2) { border-bottom: 0; }
+}
+@media (max-width: 640px) {
+  .figure { padding: 12px 14px; }
+  .figure-value { font-size: 1.25rem; }
+}
+
+/* ==========================================================================
    Responsive
    ========================================================================== */
 @media (max-width: 1180px) {

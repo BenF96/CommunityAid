@@ -79,7 +79,8 @@ app.use(async (req, res, next) => {
     } else {
       active = path.startsWith(href + '/') && !path.endsWith('/new');
     }
-    const badge = count != null ? `<span class="badge">${count}</span>` : '';
+    // Only show a count when there is something to count
+    const badge = count ? `<span class="badge">${count}</span>` : '';
     return `<a href="${href}" class="nav-link${active ? ' active' : ''}"${active ? ' aria-current="page"' : ''} title="${label}">${icon(iconName)}<span class="label">${label}</span>${badge}</a>`;
   };
 

@@ -50,7 +50,7 @@
 <div class="grid-2 grid-wide-left">
   <div>
     <section class="panel">
-      <div class="panel-head"><h2><%- icon('inbox') %> What is needed</h2></div>
+      <div class="panel-head"><h2>What is needed</h2></div>
       <p class="lead"><%= r.description %></p>
       <div class="mini-stats">
         <div><span class="mini-value"><%= r.aidType === 'food' ? 'Food' : 'Financial' %></span><span class="mini-label">Type of aid</span></div>
@@ -63,7 +63,7 @@
     </section>
 
     <section class="panel">
-      <div class="panel-head"><h2><%- icon('list') %> Timeline</h2></div>
+      <div class="panel-head"><h2>Timeline</h2></div>
       <% if (!r.history || r.history.length === 0) { %>
         <p class="muted">No history recorded for this request.</p>
       <% } else { %>
@@ -84,7 +84,7 @@
 
   <div>
     <section class="panel">
-      <div class="panel-head"><h2><%- icon('users') %> Requester</h2></div>
+      <div class="panel-head"><h2>Requester</h2></div>
       <ul class="meta-list large">
         <li><%- icon('users') %><div><span class="meta-k">Name</span><span><%= r.fullName %></span></div></li>
         <li><%- icon('phone') %><div><span class="meta-k">Phone</span><% if (r.phone) { %><a href="tel:<%= r.phone %>"><%= r.phone %></a><% } else { %><span>-</span><% } %></div></li>
@@ -93,7 +93,7 @@
     </section>
 
     <section class="panel">
-      <div class="panel-head"><h2><%- icon('pin') %> Case handling</h2></div>
+      <div class="panel-head"><h2>Case handling</h2></div>
       <% if (r.assignedResource) { %>
         <div class="assigned">
           <span class="meta-k">Assigned resource</span>

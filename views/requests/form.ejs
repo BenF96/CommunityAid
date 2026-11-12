@@ -122,7 +122,7 @@
 
   <aside class="form-aside">
     <section class="panel">
-      <h2><%- icon('pin') %> Available resources</h2>
+      <h2>Available resources</h2>
       <% ['food', 'financial'].forEach(function (cat) { var list = resources.filter(function (x) { return x.category === cat; }); %>
         <div data-show-for="<%= cat %>">
           <% if (list.length === 0) { %>
